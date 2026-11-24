@@ -55,4 +55,4 @@
 
 ## APK
 
-[Скачать APK](ССЫЛКА)
+[Скачать APK](https://github.com/Gercig/Kadr/releases/latest/download/Kadr.apk)
