@@ -34,7 +34,7 @@
 
 ## Видео
 
-[Смотреть видео](https://github.com/Gercig/Kadr/releases/download/v2.4.13/kadr2.0.mp4)
+[Смотреть видео](https://github.com/Gercig/Kadr/releases/latest/download/Kadr.mp4)
 
 ### Обзор кода
 
@@ -42,7 +42,7 @@
 
 ## APK
 
-[Скачать APK](https://github.com/Gercig/Kadr/releases/download/v2.4.13/Kadr-2.4.13-debug.apk)
+[Скачать APK](https://github.com/Gercig/Kadr/releases/latest/download/Kadr.apk)
 
 1. Скачайте файл APK на устройство с Android 8.0 или новее.
 2. Откройте файл. Если Android запросит разрешение, включите установку приложений для источника, через который открыли APK.
