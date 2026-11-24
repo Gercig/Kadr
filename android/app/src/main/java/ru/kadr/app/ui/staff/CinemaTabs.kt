@@ -40,7 +40,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.FilmBody
 import ru.kadr.app.data.SessionBody
 import ru.kadr.app.data.StaffCinema
@@ -74,8 +74,8 @@ fun SessionsTab(cinema: StaffCinema?) {
     LaunchedEffect(day, reload) {
         list = null
         try {
-            list = ApiClient.api.staffSessions(day.toString())
-            if (films.isEmpty()) films = ApiClient.api.staffFilms().filter { it.active }
+            list = LocalData.staff.staffSessions(day.toString())
+            if (films.isEmpty()) films = LocalData.staff.staffFilms().filter { it.active }
             error = null
         } catch (e: Exception) { error = e.userMessage(); list = emptyList() }
     }
@@ -127,7 +127,7 @@ private fun SessionDialog(s: StaffSession?, halls: List<StaffHall>, films: List<
             busy = true
             error = try {
                 val body = SessionBody(hall?.id ?: 0, film?.id ?: 0, "$date $time", format, price.toIntOrNull() ?: 0)
-                if (s == null) ApiClient.api.addSession(body) else ApiClient.api.editSession(s.id, body)
+                if (s == null) LocalData.staff.addSession(body) else LocalData.staff.editSession(s.id, body)
                 null
             } catch (e: Exception) { e.userMessage() }
             busy = false
@@ -152,7 +152,7 @@ private fun SessionDialog(s: StaffSession?, halls: List<StaffHall>, films: List<
             else SecondaryButton("Точно удалить?", onClick = {
                 scope.launch {
                     busy = true
-                    error = try { ApiClient.api.deleteSession(s.id); null } catch (e: Exception) { e.userMessage() }
+                    error = try { LocalData.staff.deleteSession(s.id); null } catch (e: Exception) { e.userMessage() }
                     busy = false
                     if (error == null) onDone()
                 }
@@ -171,7 +171,7 @@ fun FilmsTab() {
     var editing by remember { mutableStateOf<StaffFilm?>(null) }
     var adding by remember { mutableStateOf(false) }
     LaunchedEffect(reload) {
-        list = try { ApiClient.api.staffFilms() } catch (e: Exception) { error = e.userMessage(); emptyList() }
+        list = try { LocalData.staff.staffFilms() } catch (e: Exception) { error = e.userMessage(); emptyList() }
     }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { PrimaryButton("Добавить фильм", onClick = { adding = true }, modifier = Modifier.fillMaxWidth()) }
@@ -233,7 +233,7 @@ private fun FilmDialog(f: StaffFilm?, onDone: () -> Unit, onDismiss: () -> Unit)
                     Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
                 }
                 val body = FilmBody(title, age, genre, duration.toIntOrNull() ?: 0, description, color, active, b64)
-                if (f == null) ApiClient.api.addFilm(body) else ApiClient.api.editFilm(f.id, body)
+                if (f == null) LocalData.staff.addFilm(body) else LocalData.staff.editFilm(f.id, body)
                 null
             } catch (e: Exception) { e.userMessage() }
             busy = false

@@ -45,7 +45,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import ru.kadr.app.AppViewModel
 import ru.kadr.app.R
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.Order
 import ru.kadr.app.data.Ticket
 import ru.kadr.app.data.userMessage
@@ -79,7 +79,7 @@ fun TicketScreen(orderId: Int, onHome: () -> Unit) {
     var current by remember { mutableStateOf(0) }
     LaunchedEffect(orderId) {
         try {
-            order = ApiClient.api.order(orderId)
+            order = LocalData.booking.order(orderId)
         } catch (e: Exception) {
             error = e.userMessage()
         }
@@ -175,7 +175,7 @@ fun TicketsScreen(vm: AppViewModel, onOpen: (Int) -> Unit, onLogin: () -> Unit) 
     LaunchedEffect(vm.user) {
         if (vm.user == null) return@LaunchedEffect
         try {
-            orders = ApiClient.api.tickets()
+            orders = LocalData.booking.tickets()
         } catch (e: Exception) {
             error = e.userMessage()
         }

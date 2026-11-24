@@ -1,6 +1,7 @@
 package ru.kadr.app.ui.components
 
 import android.graphics.BitmapFactory
+import android.util.LruCache
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,35 +20,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import ru.kadr.app.data.BASE_URL
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.ui.theme.parseColor
 
-/** Постеры фильмов: грузятся с сервера один раз и хранятся в памяти (ключ — фильм и версия постера). */
+/** Изображения хранятся в Room и декодируются по мере открытия экранов. */
 object PosterCache {
-    private val http = OkHttpClient()
-    private val cache = HashMap<String, ImageBitmap>()
+    private val cache = LruCache<Pair<Int, Int>, ImageBitmap>(16)
 
     suspend fun load(filmId: Int, version: Int): ImageBitmap? {
-        val key = "$filmId:$version"
-        cache[key]?.let { return it }
-        return withContext(Dispatchers.IO) {
-            try {
-                val req = Request.Builder().url("${BASE_URL}api/films/$filmId/poster?v=$version").build()
-                http.newCall(req).execute().use { r ->
-                    if (!r.isSuccessful) return@use null
-                    val bytes = r.body()?.bytes() ?: return@use null
-                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()?.also { cache[key] = it }
-                }
-            } catch (e: Exception) {
-                null
-            }
+        val key = filmId to version
+        cache.get(key)?.let { return it }
+        val bytes = LocalData.catalog.poster(filmId) ?: return null
+        return withContext(Dispatchers.Default) {
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()?.also { cache.put(key, it) }
         }
-    }
-
-    fun put(filmId: Int, version: Int, image: ImageBitmap) {
-        cache["$filmId:$version"] = image
     }
 }
 

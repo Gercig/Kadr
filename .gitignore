@@ -6,17 +6,7 @@ android/build/
 android/app/build/
 android/local.properties
 *.iml
-# Python
-server/.venv/
-server/__pycache__/
-server/app/__pycache__/
-server/tests/__pycache__/
-server/*.db
-
-# Docker Compose
-deploy/.env
-server/*.db-*
+# Сборки и локальные файлы
 *.apk
-*.keystore
-*.jks
-.env
+*.db
+*.db-*

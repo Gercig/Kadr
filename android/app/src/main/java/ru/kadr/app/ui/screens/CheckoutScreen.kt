@@ -43,7 +43,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.kadr.app.AppViewModel
 import ru.kadr.app.R
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.Order
 import ru.kadr.app.data.PayBody
 import ru.kadr.app.data.Ticket
@@ -59,7 +59,7 @@ import ru.kadr.app.ui.components.clickableNoRipple
 import ru.kadr.app.ui.theme.Kadr
 import ru.kadr.app.ui.theme.parseColor
 
-// Типы билетов и скидки — как на сервере (services.TICKET_TYPES)
+// Типы билетов и скидки
 private val TYPES = listOf("adult" to "Взрослый", "reduced" to "Льготный", "child" to "Детский")
 private val DISCOUNT = mapOf("adult" to 0, "reduced" to 100, "child" to 150)
 
@@ -79,7 +79,7 @@ fun CheckoutScreen(vm: AppViewModel, orderId: Int, onBack: () -> Unit, onPaid: (
 
     LaunchedEffect(orderId) {
         try {
-            val o = ApiClient.api.order(orderId)
+            val o = LocalData.booking.order(orderId)
             order = o
             secondsLeft = o.secondsLeft
             o.tickets.forEach { types[it.id] = it.type }
@@ -98,7 +98,7 @@ fun CheckoutScreen(vm: AppViewModel, orderId: Int, onBack: () -> Unit, onPaid: (
     Column(Modifier.fillMaxSize().background(Kadr.Bg).statusBarsPadding()) {
         ScreenHeader("Оформление заказа", onBack = {
             // уходя назад, освобождаем места
-            scope.launch { try { ApiClient.api.cancel(orderId) } catch (ignored: Exception) { } }
+            scope.launch { try { LocalData.booking.cancel(orderId) } catch (ignored: Exception) { } }
             onBack()
         })
         if (o == null) {
@@ -177,7 +177,7 @@ fun CheckoutScreen(vm: AppViewModel, orderId: Int, onBack: () -> Unit, onPaid: (
             }
 
             Text("Способ оплаты", fontSize = 13.sp, color = Kadr.Muted, modifier = Modifier.padding(start = 4.dp))
-            PayOption("Банковская карта", "МИР, Visa, Mastercard · тестовая оплата", payMethod == "card") { payMethod = "card" }
+            PayOption("Банковская карта", "Демонстрационная оплата на устройстве", payMethod == "card") { payMethod = "card" }
             PayOption("Оплатить в кассе", "Бронь сохранится, оплата на месте", payMethod == "cash") { payMethod = "cash" }
             ErrorText(error)
         }
@@ -200,7 +200,7 @@ fun CheckoutScreen(vm: AppViewModel, orderId: Int, onBack: () -> Unit, onPaid: (
                         busy = true
                         error = null
                         try {
-                            ApiClient.api.pay(orderId, PayBody(o.tickets.map { TicketTypeBody(it.id, types[it.id] ?: "adult") }, useBonus, payMethod))
+                            LocalData.booking.pay(orderId, PayBody(o.tickets.map { TicketTypeBody(it.id, types[it.id] ?: "adult") }, useBonus, payMethod))
                             vm.refreshUser()
                             onPaid()
                         } catch (e: Exception) {

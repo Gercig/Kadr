@@ -75,7 +75,23 @@ fun LoginScreen(vm: AppViewModel, onBack: () -> Unit, onRegister: () -> Unit, on
                 fontSize = 14.sp,
                 modifier = Modifier.clickableNoRipple(onRegister).padding(vertical = 8.dp),
             )
-            Text("Сотрудники входят по логину и паролю, которые выдал администратор", color = Kadr.Muted, fontSize = 12.sp)
+            if (vm.adminSetupAvailable) {
+                Text(
+                    "Создать локального администратора с введёнными данными",
+                    color = Kadr.AccentSoft,
+                    fontSize = 14.sp,
+                    modifier = Modifier.clickableNoRipple {
+                        if (!busy) scope.launch {
+                            busy = true
+                            error = vm.createAdmin(email, password)
+                            busy = false
+                            if (error == null) onDone()
+                        }
+                    }.padding(vertical = 8.dp),
+                )
+            } else {
+                Text("Сотрудники входят с данными, выданными администратором", color = Kadr.Muted, fontSize = 12.sp)
+            }
         }
     }
 }

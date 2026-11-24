@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.CinemaBody
 import ru.kadr.app.data.HallBody
 import ru.kadr.app.data.StaffBody
@@ -97,7 +97,7 @@ private fun CinemaDialog(c: StaffCinema?, onDone: () -> Unit, onDismiss: () -> U
             busy = true
             error = try {
                 val body = CinemaBody(name, city, address, if (active) "active" else "closed")
-                if (c == null) ApiClient.api.addCinema(body) else ApiClient.api.editCinema(c.id, body)
+                if (c == null) LocalData.staff.addCinema(body) else LocalData.staff.editCinema(c.id, body)
                 null
             } catch (e: Exception) { e.userMessage() }
             busy = false
@@ -125,7 +125,7 @@ fun HallDialog(cinemaId: Int, h: StaffHall?, onDone: () -> Unit, onDismiss: () -
             busy = true
             error = try {
                 val body = HallBody(name, rows.toIntOrNull() ?: 0, seats.toIntOrNull() ?: 0, model)
-                if (h == null) ApiClient.api.addHall(cinemaId, body) else ApiClient.api.editHall(h.id, body)
+                if (h == null) LocalData.staff.addHall(cinemaId, body) else LocalData.staff.editHall(h.id, body)
                 null
             } catch (e: Exception) { e.userMessage() }
             busy = false
@@ -160,7 +160,7 @@ fun StaffTab(cinemas: List<StaffCinema>) {
     var editing by remember { mutableStateOf<StaffUser?>(null) }
     LaunchedEffect(reload) {
         list = try {
-            (ApiClient.api.staffUsers("", "cinema_admin") + ApiClient.api.staffUsers("", "controller")).sortedBy { it.cinemaName ?: "" }
+            (LocalData.staff.staffUsers("", "cinema_admin") + LocalData.staff.staffUsers("", "controller")).sortedBy { it.cinemaName ?: "" }
         } catch (e: Exception) { error = e.userMessage(); emptyList() }
     }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -198,7 +198,7 @@ private fun NewStaffDialog(cinemas: List<StaffCinema>, onDone: () -> Unit, onDis
         scope.launch {
             busy = true
             error = try {
-                ApiClient.api.addStaff(StaffBody(last, first, login, phone, password, role, cinema?.id ?: 0)); null
+                LocalData.staff.addStaff(StaffBody(last, first, login, phone, password, role, cinema?.id ?: 0)); null
             } catch (e: Exception) { e.userMessage() }
             busy = false
             if (error == null) onDone()
@@ -226,7 +226,7 @@ private fun UserDialog(u: StaffUser, cinemas: List<StaffCinema>, onDone: () -> U
     fun send(p: UserPatch) {
         scope.launch {
             busy = true
-            error = try { ApiClient.api.editUser(u.id, p); null } catch (e: Exception) { e.userMessage() }
+            error = try { LocalData.staff.editUser(u.id, p); null } catch (e: Exception) { e.userMessage() }
             busy = false
             if (error == null) onDone()
         }
@@ -263,7 +263,7 @@ fun UsersTab() {
     var reload by remember { mutableStateOf(0) }
     LaunchedEffect(q, reload) {
         delay(300)   // ищем, когда человек перестал печатать
-        list = try { ApiClient.api.staffUsers(q) } catch (e: Exception) { error = e.userMessage(); emptyList() }
+        list = try { LocalData.staff.staffUsers(q) } catch (e: Exception) { error = e.userMessage(); emptyList() }
     }
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
         KadrField(q, { q = it }, "Поиск: фамилия, имя, почта или телефон", Modifier.padding(top = 12.dp))

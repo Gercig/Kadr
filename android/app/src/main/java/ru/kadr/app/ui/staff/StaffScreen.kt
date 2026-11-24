@@ -19,7 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.kadr.app.AppViewModel
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.StaffCinema
 import ru.kadr.app.ui.components.Chip
 import ru.kadr.app.ui.components.ErrorText
@@ -53,7 +53,7 @@ fun StaffScreen(vm: AppViewModel, onBack: () -> Unit) {
     var reload by remember { mutableStateOf(0) }
     LaunchedEffect(reload) {
         try {
-            cinemas = ApiClient.api.staffCinemas()
+            cinemas = LocalData.staff.staffCinemas()
             error = null
         } catch (e: Exception) {
             error = e.userMessage()

@@ -1,6 +1,6 @@
 package ru.kadr.app.data
 
-// Данные рабочего кабинета сотрудников (поля в JSON — через подчёркивание, Gson переводит сам).
+// Данные рабочего кабинета сотрудников.
 
 data class StaffHall(
     val id: Int,
@@ -120,7 +120,7 @@ data class CheckResult(
     val admitted: Boolean?,
 )
 
-// ---------- тела запросов
+// Параметры операций
 
 data class CinemaBody(val name: String, val city: String, val address: String, val status: String = "active")
 data class HallBody(val name: String, val rows: Int, val seatsPerRow: Int, val modelUrl: String)

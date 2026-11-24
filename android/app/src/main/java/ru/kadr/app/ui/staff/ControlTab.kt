@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.launch
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.CheckBody
 import ru.kadr.app.data.CheckResult
 import ru.kadr.app.data.userMessage
@@ -37,7 +37,7 @@ import ru.kadr.app.ui.components.SecondaryButton
 import ru.kadr.app.ui.theme.Kadr
 
 /**
- * Контроль на входе: камера считывает QR-код билета, сервер отвечает, действителен ли он.
+ * Контроль на входе: камера считывает QR-код билета, приложение проверяет его по локальной базе.
  * «Пропустить» гасит билет — повторно по нему не пройти. Код можно ввести и вручную.
  */
 @Composable
@@ -53,7 +53,7 @@ fun ControlTab() {
         scope.launch {
             busy = true
             try {
-                result = ApiClient.api.checkTicket(CheckBody(c.trim(), admit)); error = null
+                result = LocalData.staff.checkTicket(CheckBody(c.trim(), admit)); error = null
             } catch (e: Exception) { error = e.userMessage() }
             busy = false
         }

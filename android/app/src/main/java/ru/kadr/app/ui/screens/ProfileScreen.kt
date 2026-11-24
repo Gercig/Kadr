@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.kadr.app.AppViewModel
 import ru.kadr.app.R
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.BonusInfo
 import ru.kadr.app.ui.components.LogoMark
 import ru.kadr.app.ui.components.PrimaryButton
@@ -47,7 +47,7 @@ fun ProfileScreen(vm: AppViewModel, onLogin: () -> Unit, onRegister: () -> Unit,
     LaunchedEffect(user?.id) {
         if (user != null) {
             vm.refreshUser()
-            bonus = try { ApiClient.api.bonus() } catch (e: Exception) { null }
+            bonus = try { LocalData.accounts.bonus() } catch (e: Exception) { null }
         }
     }
 

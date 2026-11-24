@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.kadr.app.AppViewModel
 import ru.kadr.app.R
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.FilmWithSessions
 import ru.kadr.app.data.Schedule
 import ru.kadr.app.data.SessionShort
@@ -92,7 +92,7 @@ fun HomeScreen(vm: AppViewModel, onSession: (Int) -> Unit, onLogin: (Int) -> Uni
         loading = true
         error = null
         try {
-            schedule = ApiClient.api.schedule(cinema.id, day.toString())
+            schedule = LocalData.catalog.schedule(cinema.id, day.toString())
         } catch (e: Exception) {
             error = e.userMessage()
         }

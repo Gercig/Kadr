@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.Payment
 import ru.kadr.app.data.RefundBody
 import ru.kadr.app.data.SalesReport
@@ -74,7 +74,7 @@ fun ReportTab(cinemas: List<StaffCinema>) {
     LaunchedEffect(period, cinema) {
         report = null
         try {
-            report = ApiClient.api.report(period.start.toString(), period.end.toString(), cinema); error = null
+            report = LocalData.staff.report(period.start.toString(), period.end.toString(), cinema); error = null
         } catch (e: Exception) { error = e.userMessage() }
     }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -146,7 +146,7 @@ fun PaymentsTab(cinemas: List<StaffCinema>) {
         delay(250)
         list = null
         try {
-            list = ApiClient.api.payments(cinema, period.start.toString(), period.end.toString(), status, q); error = null
+            list = LocalData.staff.payments(cinema, period.start.toString(), period.end.toString(), status, q); error = null
         } catch (e: Exception) { error = e.userMessage(); list = emptyList() }
     }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -163,7 +163,7 @@ fun PaymentsTab(cinemas: List<StaffCinema>) {
                     Title("Заказ №${p.id} · ${rub(p.total)}")
                     Badge(p.statusName, when (p.status) { "paid" -> Kadr.Mint; "reserved" -> Kadr.Gold; "refunded" -> Kadr.AccentSoft; else -> Kadr.Muted })
                 }
-                Note("${shortStamp(p.createdAt)} · ${if (p.payMethod == "card") "картой онлайн" else "на кассе"}${if (p.bonusUsed > 0) " · бонусами ${p.bonusUsed}" else ""}")
+                Note("${shortStamp(p.createdAt)} · ${if (p.payMethod == "card") "тестовая оплата картой" else "на кассе"}${if (p.bonusUsed > 0) " · бонусами ${p.bonusUsed}" else ""}")
                 Note("${p.user} · ${p.email} · ${p.phone}")
                 Note("${p.film} · ${shortStamp(p.startsAt)} · ${p.cinema}, ${p.hall} · билетов: ${p.tickets}")
                 if (p.refundReason != null) Note("Возврат ${shortStamp(p.refundedAt)}: ${p.refundReason}", Kadr.AccentSoft)
@@ -185,7 +185,7 @@ private fun RefundDialog(p: Payment, onDone: () -> Unit, onDismiss: () -> Unit) 
     FormDialog("Возврат по заказу №${p.id}", error, busy, confirm = "Подтвердить возврат", onDismiss = onDismiss, onConfirm = {
         scope.launch {
             busy = true
-            error = try { ApiClient.api.refund(p.id, RefundBody(reason)); null } catch (e: Exception) { e.userMessage() }
+            error = try { LocalData.staff.refund(p.id, RefundBody(reason)); null } catch (e: Exception) { e.userMessage() }
             busy = false
             if (error == null) onDone()
         }

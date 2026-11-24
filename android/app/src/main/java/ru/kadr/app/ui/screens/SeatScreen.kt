@@ -74,7 +74,7 @@ import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 import ru.kadr.app.AppViewModel
 import ru.kadr.app.R
-import ru.kadr.app.data.ApiClient
+import ru.kadr.app.data.local.LocalData
 import ru.kadr.app.data.OrderBody
 import ru.kadr.app.data.SeatBody
 import ru.kadr.app.data.SessionInfo
@@ -102,7 +102,7 @@ fun SeatScreen(vm: AppViewModel, sessionId: Int, onBack: () -> Unit, onOrder: (I
 
     LaunchedEffect(sessionId) {
         try {
-            val s = ApiClient.api.session(sessionId)
+            val s = LocalData.catalog.session(sessionId)
             info = s
             focus = SeatId((s.hall.rows + 1) / 2 + 1, (s.hall.seatsPerRow + 1) / 2)
         } catch (e: Exception) {
@@ -327,12 +327,12 @@ fun SeatScreen(vm: AppViewModel, sessionId: Int, onBack: () -> Unit, onOrder: (I
                         busy = true
                         error = null
                         try {
-                            val order = ApiClient.api.createOrder(OrderBody(sessionId, picked.map { SeatBody(it.row, it.seat) }))
+                            val order = LocalData.booking.createOrder(OrderBody(sessionId, picked.map { SeatBody(it.row, it.seat) }))
                             onOrder(order.id)
                         } catch (e: Exception) {
                             error = e.userMessage()
                             // места могли занять — обновим схему
-                            try { info = ApiClient.api.session(sessionId) } catch (ignored: Exception) { }
+                            try { info = LocalData.catalog.session(sessionId) } catch (ignored: Exception) { }
                             picked.clear()
                         }
                         busy = false
@@ -416,6 +416,7 @@ private fun SeatView3D(
                         // Явный размер «на весь блок»: без него WebView подгоняет высоту под содержимое и холст получает высоту 0
                         layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                         settings.javaScriptEnabled = true
+                        settings.blockNetworkLoads = true
                         // Свайп по 3D-виду поворачивает взгляд, а не прокручивает экран
                         setOnTouchListener { v, _ ->
                             v.parent?.requestDisallowInterceptTouchEvent(true)
@@ -472,7 +473,7 @@ private fun SeatView3D(
     }
 }
 
-/** Правило «нельзя через одно место»: одиночные свободные места между выбранными/занятыми (как на сервере).
+/** Правило «нельзя через одно место»: одиночные свободные места между выбранными/занятыми.
  *  Места по разные стороны прохода соседями не считаются. */
 private fun singleGaps(picked: Set<SeatId>, taken: Set<SeatId>, cols: Int, aisles: List<Int> = emptyList()): Set<SeatId> {
     val occupied = picked + taken

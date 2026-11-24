@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Разрешаем обычный HTTP (без шифрования) для учебного сервера.
-     Для сервера в Yandex Cloud лучше настроить HTTPS и убрать это разрешение. -->
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
-</network-security-config>

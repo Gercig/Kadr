@@ -1,8 +1,5 @@
 package ru.kadr.app.data
 
-// Модели данных, которые приходят с сервера (поля в JSON пишутся через подчёркивание,
-// Gson сам переводит их в camelCase — см. ApiClient).
-
 data class User(
     val id: Int,
     val lastName: String,
@@ -14,8 +11,6 @@ data class User(
     val bonus: Int,
     val mustChangePassword: Boolean,
 )
-
-data class AuthResponse(val token: String, val user: User)
 
 data class Cinema(
     val id: Int,
@@ -118,7 +113,7 @@ data class Order(
 data class BonusOp(val amount: Int, val reason: String, val createdAt: String)
 data class BonusInfo(val balance: Int, val history: List<BonusOp>)
 
-// ---------- тела запросов
+// Параметры операций
 
 data class RegisterBody(
     val lastName: String,

@@ -1,8 +1,6 @@
 package ru.kadr.app.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.height
@@ -19,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import ru.kadr.app.BuildConfig
 import ru.kadr.app.ui.components.LogoMark
 import ru.kadr.app.ui.theme.Kadr
 
@@ -48,8 +45,6 @@ fun SplashScreen(ready: Boolean, onFinished: () -> Unit) {
             Text("КИНОТЕАТР", fontSize = if (small) 12.sp else 14.sp, letterSpacing = 5.sp, color = Kadr.Muted)
             Spacer(Modifier.weight(1f))
             Text("Сеть кинотеатров", color = Kadr.Muted, fontSize = 12.sp)
-            Spacer(Modifier.height(4.dp))
-            Text("Версия ${BuildConfig.VERSION_NAME}", color = Kadr.Muted, fontSize = 12.sp)
         }
     }
 }
