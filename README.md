@@ -51,7 +51,7 @@
 
 ## Видео
 
-[Смотреть видео](ССЫЛКА)
+[Скачать видео о приложении](https://github.com/Gercig/Kadr/releases/download/room/Kadr.mp4)
 
 ## APK
 
